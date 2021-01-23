@@ -120,7 +120,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
                     children: <Widget>[
                       Image.network("https://image.tmdb.org/t/p/w342/${top
                           .results[index].posterPath}"),
-                      SizedBox(height:20),
+                      SizedBox(height:MediaQuery.of(context).size.height/50),
                       Text(top.results[index].title,style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
