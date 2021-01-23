@@ -91,7 +91,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
       body:isDataLoaded?GridView.count(
       shrinkWrap: true,
       primary: false,
-      childAspectRatio: 100/175,
+      childAspectRatio: 90/148,
       crossAxisCount: 2,
         children: List.generate(top.results.length, (index) {
           return Container(
@@ -120,7 +120,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
                     children: <Widget>[
                       Image.network("https://image.tmdb.org/t/p/w342/${top
                           .results[index].posterPath}"),
-                      SizedBox(height:MediaQuery.of(context).size.height/50),
+                      SizedBox(height:MediaQuery.of(context).size.height/50,width:MediaQuery.of(context).size.width),
                       Text(top.results[index].title,style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
