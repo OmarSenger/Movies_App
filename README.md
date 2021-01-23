@@ -1,16 +1,26 @@
-# movie_app
+Movies App using API :
 
-A new Flutter project.
+The app simply shows you the highest rate and popular movies with some details of the movies like ( overview , popularity , main language and vote average ) using the API from www.themoviedb.org .  
 
-## Getting Started
+Widget and Packages Used : 
+1- HTTP Package this package allows you to deal with api links . if you wanna use it you can get it from here : https://pub.dev/packages/http 
+2- CircularProgressIndicator
+3- MediaQuery
+4- PopupMenuButton
+5- GridView.count 
+6- Image.network 
+7- BottomNavigationBar 
+8- Coulmn 
+9- Center 
+10- Row 
+11- GestureDetector 
+12- Card
+13- AlertDialog
+14- Flushbar Package . if you wanna use it you can get it from here : https://pub.dev/packages/flushbar
+15- SingleChildScrollView
+16- Stack
+17- Container
+18- GestureDetector
+19- SizedBox
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+APP GIF Preview : 
