@@ -56,15 +56,16 @@ class Details extends StatelessWidget {
             Stack(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top:MediaQuery.of(context).size.height*0.38),
+                  padding: EdgeInsets.only(top:MediaQuery.of
+                    (context).size.height*0.38),
                   child: Container(
                     width: width,
-                    height: height/3.2,
+                    height: height/2.5,
                     color: Colors.grey.shade200,
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(7.0),
+                          padding: const EdgeInsets.all(5),
                           child: Image.network(args.image),
                         ),
                         Container(
@@ -74,12 +75,12 @@ class Details extends StatelessWidget {
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.only(top:MediaQuery.of(context).size.height/38),
+                                  padding: EdgeInsets.only(top:MediaQuery.of(context).size.height/30),
                                   child: Text(args.title),
                                 ),
                                 SizedBox(height: height*0.05),
                                 Text(args.releaseDate),
-                                SizedBox(height:height*0.05),
+                                SizedBox(height:height*0.1),
                                 RaisedButton(
                                     color: Colors.teal.shade400,
                                     child: Text('Reviews',
@@ -135,7 +136,7 @@ class Details extends StatelessWidget {
             ),
             Divider(
                 color: Colors.grey,
-                height: height*0.02,
+                height: height*0.05,
                 endIndent: width/20,
                 indent: width/20),
             Row(
