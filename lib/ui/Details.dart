@@ -60,7 +60,7 @@ class Details extends StatelessWidget {
                     (context).size.height*0.38),
                   child: Container(
                     width: width,
-                    height: height/2.5,
+                    height: height/3,
                     color: Colors.grey.shade200,
                     child: Row(
                       children: [
@@ -69,7 +69,7 @@ class Details extends StatelessWidget {
                           child: Image.network(args.image),
                         ),
                         Container(
-                          width: width/1.9,
+                          width: width/2,
                           height: height*0.5,
                           child: SingleChildScrollView(
                             child: Column(
