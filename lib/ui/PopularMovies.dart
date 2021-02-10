@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/model/Popular.dart';
 import 'package:movie_app/network/Services.dart';
 import 'package:movie_app/ui/Details.dart';
 import 'package:movie_app/ui/HomePage.dart';
+import 'Favourite.dart';
+import 'Login.dart';
 
 
 class PopularMovies extends StatefulWidget {
@@ -23,18 +26,26 @@ class _PopularMoviesState extends State<PopularMovies> {
             MaterialPageRoute(builder: (context) => HomePage()),
           );
           break;
+        case 'Favourite':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Favourite()),
+          );
+          break;
       }
     });
   }
   var urlImg = 'https://www.eduprizeschools.net/wp-content/uploads/2016/06/No_Image_Available.jpg';
-  var options = <String>['Highest Rated','Most Popular'];
+  var options = <String>['Highest Rated','Most Popular','Favourite'];
   bool isDataLoaded = false ;
+  final _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     getJsonData();
   }
+
 
   Popular most = Popular();
 
@@ -53,6 +64,15 @@ class _PopularMoviesState extends State<PopularMovies> {
         backgroundColor: Colors.pink,
         title:Text('Popular Movies') ,
         actions: <Widget>[
+          GestureDetector(
+              onTap: (){
+                _auth.signOut();
+                Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => Login()));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Logout',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+              )),
           PopupMenuButton<String>(
             onSelected: handleClick ,
             itemBuilder: (BuildContext context) {

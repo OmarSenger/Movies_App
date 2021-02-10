@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/network/Services.dart';
 import 'package:movie_app/model/TopRated.dart';
 import 'package:movie_app/ui/Details.dart';
+import 'package:movie_app/ui/Favourite.dart';
 import 'package:movie_app/ui/PopularMovies.dart';
+import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'Login.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -31,15 +35,26 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
 
   var urlImg = 'https://www.eduprizeschools.net/wp-content/uploads/2016/06/No_Image_Available.jpg';
   bool isDataLoaded = false ;
+  final _auth = FirebaseAuth.instance;
 
     int index =0;
 
   @override
   void initState() {
     super.initState();
+    BackButtonInterceptor.add(myInterceptor);
     getJsonData();
   }
 
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
+    super.dispose();
+  }
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    Navigator.pop(context); // Do some stuff.
+    return true;
+  }
 
   void handleClick(String value) {
     setState(() {
@@ -52,12 +67,18 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
             MaterialPageRoute(builder: (context) => PopularMovies()),
           );
           break;
+        case 'Favourite':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Favourite()),
+          );
+          break;
       }
     });
   }
 
   TopRated top = TopRated();
-  var options = <String>['Highest Rated','Most Popular'];
+  var options = <String>['Highest Rated','Most Popular','Favourite'];
 
   void getJsonData () async {
     final data = await Services().getTopMovies();
@@ -75,6 +96,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
         backgroundColor: Colors.pink,
         title:Text('Highest Rated') ,
         actions: <Widget>[
+          GestureDetector(
+              onTap: (){
+                _auth.signOut();
+                Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => Login()));
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text('Logout',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+              )),
           PopupMenuButton<String>(
             onSelected: handleClick ,
             itemBuilder: (BuildContext context) {
