@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:movie_app/network/Services.dart';
+import 'package:movie_app/blocs/movie_bloc.dart';
 import 'package:movie_app/model/TopRated.dart';
 import 'package:movie_app/ui/Details.dart';
 import 'package:movie_app/ui/Favourite.dart';
@@ -8,42 +8,17 @@ import 'package:movie_app/ui/PopularMovies.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'Login.dart';
 
-
-class HomePage extends StatelessWidget {
-  static const String _title = 'Movie App';
-
+class HomePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: _title,
-      debugShowCheckedModeBanner: false,
-      home: MyStatefulWidget(),
-    );
-  }
+  _HomePageState createState() => _HomePageState();
 }
 
-class MyStatefulWidget extends StatefulWidget {
+class _HomePageState extends State<HomePage> {
 
-
-  MyStatefulWidget({Key key}) : super(key: key);
-
-  @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
-}
-
-class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerProviderStateMixin {
-
-  var urlImg = 'https://www.eduprizeschools.net/wp-content/uploads/2016/06/No_Image_Available.jpg';
-  bool isDataLoaded = false ;
-  final _auth = FirebaseAuth.instance;
-
-    int index =0;
-
-  @override
+    @override
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
-    getJsonData();
   }
 
   @override
@@ -51,6 +26,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
     BackButtonInterceptor.remove(myInterceptor);
     super.dispose();
   }
+
+  final _auth = FirebaseAuth.instance;
+  var options = <String>['Highest Rated','Most Popular','Favourite'];
+
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pop(context); // Do some stuff.
     return true;
@@ -76,25 +55,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
       }
     });
   }
-
-  TopRated top = TopRated();
-  var options = <String>['Highest Rated','Most Popular','Favourite'];
-
-  void getJsonData () async {
-    final data = await Services().getTopMovies();
-    setState(() {
-      top = data;
-      isDataLoaded = true ;
-    });
-  }
-
+  @override
   Widget build(BuildContext context) {
-
+    bloc.getTopMovies();
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.pink,
-        title:Text('Highest Rated') ,
+        title: Text('Highest Rated'),
         actions: <Widget>[
           GestureDetector(
               onTap: (){
@@ -117,28 +83,45 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
             },
           ),
         ],
-        ),
-      body:isDataLoaded?GridView.count(
-      shrinkWrap: true,
-      primary: false,
-      childAspectRatio: 90/148,
-      crossAxisCount: 2,
-        children: List.generate(top.results.length, (index) {
+      ),
+      body: StreamBuilder(
+        stream: bloc.topMovies,
+        builder: (context, AsyncSnapshot<TopRated> snapshot) {
+          if (snapshot.hasData) {
+            return buildList(snapshot);
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          return Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+
+  Widget buildList(AsyncSnapshot<TopRated> snapshot) {
+    return GridView.count(
+        shrinkWrap: true,
+        primary: false,
+        childAspectRatio: 90 / 148,
+        crossAxisCount: 2,
+        children: List.generate(snapshot.data.results.length, (index) {
           return Container(
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) => Details(args: PopData(
-                        image: "https://image.tmdb.org/t/p/w342/${top
-                            .results[index].posterPath}",
-                        title: top.results[index].title,
-                        overview: top.results[index].overview,
-                        releaseDate: top.results[index].releaseDate,
-                        voteAverage: top.results[index].voteAverage,
-                        popularity: top.results[index].popularity,
-                        language: top.results[index].originalLanguage)),
+                    builder: (BuildContext context) =>
+                        Details(args: PopData(
+                            image: "https://image.tmdb.org/t/p/w342/${snapshot.data
+                                .results[index].posterPath}",
+                            title: snapshot.data.results[index].title,
+                            overview: snapshot.data.results[index].overview,
+                            releaseDate: snapshot.data.results[index].releaseDate,
+                            voteAverage: snapshot.data.results[index].voteAverage,
+                            popularity: snapshot.data.results[index].popularity,
+                            language: snapshot.data.results[index].originalLanguage,
+                            video: snapshot.data.results[index].video)),
                   ),
                 );
               },
@@ -148,10 +131,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      Image.network("https://image.tmdb.org/t/p/w342/${top
-                          .results[index].posterPath}"),
-                      SizedBox(height:MediaQuery.of(context).size.height/50,width:MediaQuery.of(context).size.width),
-                      Text(top.results[index].title,style: TextStyle(
+                      Image.network("https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}"),
+                      SizedBox(height: MediaQuery
+                          .of(context)
+                          .size
+                          .height / 50, width: MediaQuery
+                          .of(context)
+                          .size
+                          .width),
+                      Text(snapshot.data.results[index].title, style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 15)
@@ -163,8 +151,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> with SingleTickerPr
             ),
           );
         })
-    ):Center(
-    child: CircularProgressIndicator(backgroundColor:Colors.white)),
     );
-        }
   }
+}

@@ -114,7 +114,7 @@ class _FavouriteState extends State<Favourite> {
                   return LinearProgressIndicator();
                 } else {
                   return ListTile(
-                    title: Text('${snapshot.data['movie']}'),
+                    title: Text('${snapshot.data['movie-name']}'),
                   );
                 }
               },

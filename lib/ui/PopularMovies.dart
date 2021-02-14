@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/blocs/movie_bloc.dart';
 import 'package:movie_app/model/Popular.dart';
-import 'package:movie_app/network/Services.dart';
 import 'package:movie_app/ui/Details.dart';
 import 'package:movie_app/ui/HomePage.dart';
 import 'Favourite.dart';
@@ -15,16 +15,19 @@ class PopularMovies extends StatefulWidget {
 
 class _PopularMoviesState extends State<PopularMovies> {
 
+  final _auth = FirebaseAuth.instance;
+  var options = <String>['Highest Rated','Most Popular','Favourite'];
+
   void handleClick(String value) {
     setState(() {
       switch (value) {
-        case 'Most Popular':
-          break;
-        case 'Highest Rated':
+        case 'Highest Rate':
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
           );
+          break;
+        case 'Most Popular':
           break;
         case 'Favourite':
           Navigator.push(
@@ -35,34 +38,12 @@ class _PopularMoviesState extends State<PopularMovies> {
       }
     });
   }
-  var urlImg = 'https://www.eduprizeschools.net/wp-content/uploads/2016/06/No_Image_Available.jpg';
-  var options = <String>['Highest Rated','Most Popular','Favourite'];
-  bool isDataLoaded = false ;
-  final _auth = FirebaseAuth.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    getJsonData();
-  }
-
-
-  Popular most = Popular();
-
-  void getJsonData () async {
-    final data = await Services().getPopularMovies();
-    setState(() {
-      most = data;
-      isDataLoaded = true ;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    bloc.getPopularMovies();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.pink,
-        title:Text('Popular Movies') ,
+        title: Text('Highest Rated'),
         actions: <Widget>[
           GestureDetector(
               onTap: (){
@@ -86,26 +67,45 @@ class _PopularMoviesState extends State<PopularMovies> {
           ),
         ],
       ),
-      body:isDataLoaded?GridView.count(
+      body: StreamBuilder(
+        stream: bloc.popMovies,
+        builder: (context, AsyncSnapshot<Popular> snapshot) {
+          if (snapshot.hasData) {
+            return buildList(snapshot);
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          return Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+
+  Widget buildList(AsyncSnapshot<Popular> snapshot) {
+    return GridView.count(
         shrinkWrap: true,
         primary: false,
-        childAspectRatio: 100/175,
+        childAspectRatio: 90 / 148,
         crossAxisCount: 2,
-          children: List.generate(most.results.length, (index) {
+        children: List.generate(snapshot.data.results.length, (index) {
           return Container(
             child: GestureDetector(
-              onTap: (){
+              onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Details(args: PopData(
-                    image: "https://image.tmdb.org/t/p/w342/${most.results[index].posterPath}",
-                    title: most.results[index].title,
-                    overview: most.results[index].overview,
-                    releaseDate: most.results[index].releaseDate,
-                    voteAverage: most.results[index].voteAverage,
-                    popularity: most.results[index].popularity,
-                    language: most.results[index].originalLanguage)),
-                ),
+                  MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        Details(args: PopData(
+                            image: "https://image.tmdb.org/t/p/w342/${snapshot.data
+                                .results[index].posterPath}",
+                            title: snapshot.data.results[index].title,
+                            overview: snapshot.data.results[index].overview,
+                            releaseDate: snapshot.data.results[index].releaseDate,
+                            voteAverage: snapshot.data.results[index].voteAverage,
+                            popularity: snapshot.data.results[index].popularity,
+                            language: snapshot.data.results[index].originalLanguage,
+                            video: snapshot.data.results[index].video)),
+                  ),
                 );
               },
               child: Card(
@@ -114,23 +114,26 @@ class _PopularMoviesState extends State<PopularMovies> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      Image.network("https://image.tmdb.org/t/p/w342/${most.results[index].posterPath}"),
-                    SizedBox(height: 20),
-                    Text(most.results[index].title, style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15)
-                    ),
+                      Image.network("https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}"),
+                      SizedBox(height: MediaQuery
+                          .of(context)
+                          .size
+                          .height / 50, width: MediaQuery
+                          .of(context)
+                          .size
+                          .width),
+                      Text(snapshot.data.results[index].title, style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15)
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
           );
-        },
-          ),
-      ):Center(
-      child: CircularProgressIndicator(backgroundColor:Colors.white)),
+        })
     );
   }
 }

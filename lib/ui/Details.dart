@@ -286,5 +286,6 @@ class PopData {
   final double voteAverage ;
   final double popularity;
   final String language;
-  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language});
+  final bool video ;
+  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.video});
 }
