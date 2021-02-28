@@ -103,24 +103,28 @@ class _FavouriteState extends State<Favourite> {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          Card(
-            elevation: 10.0,
-            color: Colors.white,
-            child: FutureBuilder(future: getUsers(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (!snapshot.hasData) {
-                  return LinearProgressIndicator();
-                } else {
-                  return ListTile(
-                    title: Text('${snapshot.data['movie-name']}'),
-                  );
-                }
+      body: FutureBuilder(future: getUsers(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (!snapshot.hasData) {
+            return LinearProgressIndicator();
+          } else {
+            return GestureDetector(
+              onTap: (){
               },
-            ),
-          ),
-        ],
+              child: ListView.builder(
+                  itemCount: snapshot.data['movie-name'].length,
+                  itemBuilder: (context,index){
+                    return Card(
+                      elevation: 10,
+                      child: ListTile(
+                        title: Text(snapshot.data['movie-name'][index]),
+                      ),
+                    );
+                  }
+              ),
+            );
+          }
+        },
       ),
     );
   }

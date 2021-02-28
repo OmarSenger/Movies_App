@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User loggedInUser ;
@@ -40,6 +41,7 @@ class _DetailsState extends State<Details> {
   bool _isFavourited = false ;
 
   List<String> fav = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -171,16 +173,18 @@ class _DetailsState extends State<Details> {
                                   _isFavourited = true;
                                   fav.add(widget.args.title);
                                   _firestore.collection('Favourite').doc(
-                                     loggedInUser.uid).set(
+                                      loggedInUser.uid).set(
                                       {
-                                        'movie-name':widget.args.title,
+                                        'movie-name':FieldValue.arrayUnion([widget.args.title]),
                                         'user': loggedInUser.email,
-                                      });
-                                  _firestore.collection('Favourite').doc(
-                                      loggedInUser.uid).update(
-                                      {
-                                        'movie':FieldValue.arrayUnion([widget.args.title])
-                                      });
+                                      }, SetOptions(merge: true)).then((value){
+                                    _firestore.collection('Favourite').doc(
+                                        loggedInUser.uid).update(
+                                        {
+                                          'movie-name':FieldValue.arrayUnion([widget.args.title]),
+                                          'user': loggedInUser.email,
+                                        });
+                                  });
                                   Flushbar(
                                     title: widget.args.title,
                                     message: 'Added to favourite',
@@ -200,8 +204,11 @@ class _DetailsState extends State<Details> {
                                 }
                               });
                             },
-                            child: Icon(_isFavourited&&fav.first==widget.args.title ? Icons.favorite : Icons
-                                .favorite_border),
+                            child: IconTheme(
+                              data: IconThemeData(color: Colors.white),
+                              child: Icon(_isFavourited&&fav.first==widget.args.title ? Icons.favorite : Icons
+                                  .favorite_border),
+                            ),
                             ),
                       );
                     }
@@ -278,6 +285,7 @@ class _DetailsState extends State<Details> {
   }
 
 }
+
 class PopData {
   final String image ;
   final String title;

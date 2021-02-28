@@ -113,8 +113,7 @@ class _HomePageState extends State<HomePage> {
                   MaterialPageRoute(
                     builder: (BuildContext context) =>
                         Details(args: PopData(
-                            image: "https://image.tmdb.org/t/p/w342/${snapshot.data
-                                .results[index].posterPath}",
+                            image: "https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}",
                             title: snapshot.data.results[index].title,
                             overview: snapshot.data.results[index].overview,
                             releaseDate: snapshot.data.results[index].releaseDate,

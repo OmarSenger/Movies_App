@@ -3,7 +3,6 @@ import 'package:movie_app/model/TopRated.dart';
 import 'package:movie_app/model/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
-
 class MoviesBloc {
   final _repository = Repository();
   final _topmoviesFetcher = PublishSubject<TopRated>();

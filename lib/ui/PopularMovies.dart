@@ -43,7 +43,7 @@ class _PopularMoviesState extends State<PopularMovies> {
     bloc.getPopularMovies();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Highest Rated'),
+        title: Text('Popular Movies'),
         actions: <Widget>[
           GestureDetector(
               onTap: (){
