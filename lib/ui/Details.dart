@@ -178,12 +178,6 @@ class _DetailsState extends State<Details> {
                                         'movie-name':FieldValue.arrayUnion([widget.args.title]),
                                         'user': loggedInUser.email,
                                       }, SetOptions(merge: true)).then((value){
-                                    _firestore.collection('Favourite').doc(
-                                        loggedInUser.uid).update(
-                                        {
-                                          'movie-name':FieldValue.arrayUnion([widget.args.title]),
-                                          'user': loggedInUser.email,
-                                        });
                                   });
                                   Flushbar(
                                     title: widget.args.title,
