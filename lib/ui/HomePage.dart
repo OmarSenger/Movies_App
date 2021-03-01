@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
     bloc.getTopMovies();
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Highest Rated'),
         actions: <Widget>[
           GestureDetector(

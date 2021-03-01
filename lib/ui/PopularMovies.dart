@@ -21,7 +21,7 @@ class _PopularMoviesState extends State<PopularMovies> {
   void handleClick(String value) {
     setState(() {
       switch (value) {
-        case 'Highest Rate':
+        case 'Highest Rated':
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),

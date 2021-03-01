@@ -19,6 +19,7 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
 
+  PopData popData = PopData();
   final _auth = FirebaseAuth.instance;
 
   @override
@@ -40,8 +41,8 @@ class _DetailsState extends State<Details> {
 
   bool _isFavourited = false ;
 
-  List<String> fav = [];
-
+  var fav = [];
+int index ;
 
   @override
   Widget build(BuildContext context) {
@@ -177,8 +178,7 @@ class _DetailsState extends State<Details> {
                                       {
                                         'movie-name':FieldValue.arrayUnion([widget.args.title]),
                                         'user': loggedInUser.email,
-                                      }, SetOptions(merge: true)).then((value){
-                                  });
+                                      },SetOptions(merge: true));
                                   Flushbar(
                                     title: widget.args.title,
                                     message: 'Added to favourite',
@@ -187,8 +187,10 @@ class _DetailsState extends State<Details> {
                                 } else if (_isFavourited==true){
                                   setState(() {
                                     _isFavourited=false ;
-                                    fav.remove(widget.args.title);
-                                    _firestore.collection('Favourite').doc(loggedInUser.uid).delete();
+                                    _firestore.collection('Favourite').doc(loggedInUser.uid).update({
+                                      'movie-name':FieldValue.arrayRemove(fav)
+                                    });
+
                                   });
                                   Flushbar(
                                     title: widget.args.title,
@@ -200,7 +202,7 @@ class _DetailsState extends State<Details> {
                             },
                             child: IconTheme(
                               data: IconThemeData(color: Colors.white),
-                              child: Icon(_isFavourited&&fav.first==widget.args.title ? Icons.favorite : Icons
+                              child: Icon(_isFavourited&& fav.last==widget.args.title? Icons.favorite : Icons
                                   .favorite_border),
                             ),
                             ),
@@ -290,4 +292,13 @@ class PopData {
   final String language;
   final bool video ;
   PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.video});
+}
+
+Future deleteFavorite(PopData popData) async {
+  var userSnapshot = await _firestore.collection('Favourite').doc(loggedInUser.uid).get();
+  var data = userSnapshot.data();
+  data['movie-name'] = data['movie-name'].where((item) {
+    return item['title'] != popData.title;
+  }).toList();
+  return await _firestore.collection('Favourite').doc(loggedInUser.uid).update(data);
 }
