@@ -112,7 +112,7 @@ PopData popData = PopData();
           } else if (snapshot.hasError) {
             return Text(snapshot.error.toString());
           }
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(backgroundColor: Colors.pink));
         },
       ),
     );

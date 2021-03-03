@@ -78,7 +78,7 @@ class _PopularMoviesState extends State<PopularMovies> {
           } else if (snapshot.hasError) {
             return Text(snapshot.error.toString());
           }
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(backgroundColor: Colors.pink));
         },
       ),
     );

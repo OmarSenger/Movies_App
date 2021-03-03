@@ -27,7 +27,6 @@ class _DetailsState extends State<Details> {
     getCurrentUser();
     checkMovieFav();
   }
-bool methodDone = false ;
 
   List<String> list = [];
   Future checkMovieFav()async{
@@ -36,16 +35,13 @@ bool methodDone = false ;
           List.from(value.data()['movie-name']).forEach((element) {
             list.add(element);
             if(list.contains(widget.args.title)){
-
-              _isFavourited = true;
+              isFavourited = true;
             }else {
-              _isFavourited = false ;
+              isFavourited = false ;
             }
           });
-
         });
       });
-    methodDone = true ;
   }
 
 
@@ -61,7 +57,7 @@ bool methodDone = false ;
     }
   }
 
-  bool _isFavourited = false ;
+  bool isFavourited = false ;
 
   var fav = [];
 int index ;
@@ -192,8 +188,8 @@ int index ;
                         child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (_isFavourited==false) {
-                                  _isFavourited = true;
+                                if (isFavourited==false) {
+                                  isFavourited = true;
                                   fav.add(widget.args.title);
                                   _firestore.collection('Favourite').doc(
                                       loggedInUser.uid).set(
@@ -207,9 +203,9 @@ int index ;
                                     message: 'Added to favourite',
                                     duration: Duration(seconds: 2),
                                   ).show(context);
-                                } else if (_isFavourited==true){
+                                } else if (isFavourited==true){
                                   setState((){
-                                    _isFavourited=false ;
+                                    isFavourited=false ;
                                     _firestore.collection('Favourite').doc(loggedInUser.uid).update({
                                       'movie-name':FieldValue.arrayRemove(fav)
                                     });
@@ -222,14 +218,12 @@ int index ;
                                 }
                               });
                             },
-                          child: Center(
-                            child: methodDone? IconTheme(
-                              data: IconThemeData(color: Colors.white),
-                              child: Icon(_isFavourited?Icons.favorite : Icons
-                                  .favorite_border),
-                            ):CircularProgressIndicator(),
-                          ),
-                            ),
+                          child:  IconTheme(
+                            data: IconThemeData(color: Colors.white),
+                            child: Icon(isFavourited?Icons.favorite : Icons
+                                .favorite_border),
+                            )
+                        ),
                       );
                     }
                     ),
