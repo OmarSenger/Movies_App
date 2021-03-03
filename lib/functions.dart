@@ -1,19 +1,23 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:movie_app/model/TopRated.dart';
+import 'package:movie_app/ui/Details.dart';
+
+import 'blocs/movie_bloc.dart';
 
 final _firestore = FirebaseFirestore.instance;
 List<String> list = [];
 bool isFavourited = false ;
 User loggedInUser ;
 final _auth = FirebaseAuth.instance;
-// PopData popData = PopData();
 
+//
 // Future checkMovieFav()async{
 //   await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
 //       List.from(value.data()['movie-name']).forEach((element) {
 //         list.add(element);
-//         if(list.contains(popData.title)){
+//         if(list.contains()){
 //           print('x:$element');
 //           isFavourited = true;
 //         }else {

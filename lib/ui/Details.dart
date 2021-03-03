@@ -28,24 +28,6 @@ class _DetailsState extends State<Details> {
     checkMovieFav();
   }
 
-  List<String> list = [];
-  Future checkMovieFav()async{
-    await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
-        setState(() {
-          List.from(value.data()['movie-name']).forEach((element) {
-            list.add(element);
-            if(list.contains(widget.args.title)){
-              isFavourited = true;
-            }else {
-              isFavourited = false ;
-            }
-          });
-        });
-      });
-  }
-
-
-
   void getCurrentUser() async {
     try{
       final user = _auth.currentUser;
@@ -57,10 +39,26 @@ class _DetailsState extends State<Details> {
     }
   }
 
-  bool isFavourited = false ;
+  bool _isFavourited = false ;
 
   var fav = [];
 int index ;
+
+  List<String> list = [];
+  Future checkMovieFav()async{
+    await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
+      setState(() {
+        List.from(value.data()['movie-name']).forEach((element) {
+          list.add(element);
+          if(list.contains(widget.args.title)){
+            _isFavourited = true;
+          }else{
+            _isFavourited = false ;
+          }
+        });
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,9 +186,8 @@ int index ;
                         child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (isFavourited==false) {
-                                  isFavourited = true;
-                                  fav.add(widget.args.title);
+                                if (_isFavourited==false) {
+                                  _isFavourited = true;
                                   _firestore.collection('Favourite').doc(
                                       loggedInUser.uid).set(
                                       {
@@ -203,9 +200,10 @@ int index ;
                                     message: 'Added to favourite',
                                     duration: Duration(seconds: 2),
                                   ).show(context);
-                                } else if (isFavourited==true){
+                                } else if (_isFavourited==true){
                                   setState((){
-                                    isFavourited=false ;
+                                    _isFavourited=false ;
+                                    fav.add(widget.args.title);
                                     _firestore.collection('Favourite').doc(loggedInUser.uid).update({
                                       'movie-name':FieldValue.arrayRemove(fav)
                                     });
@@ -220,9 +218,9 @@ int index ;
                             },
                           child:  IconTheme(
                             data: IconThemeData(color: Colors.white),
-                            child: Icon(isFavourited?Icons.favorite : Icons
+                            child: Icon(_isFavourited?Icons.favorite : Icons
                                 .favorite_border),
-                            )
+                            ),
                         ),
                       );
                     }
@@ -307,6 +305,7 @@ class PopData {
   final double voteAverage ;
   final double popularity;
   final String language;
-  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language});
+  final bool fav;
+  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.fav=false});
 
 }

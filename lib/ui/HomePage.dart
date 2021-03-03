@@ -17,10 +17,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-
-
-PopData popData = PopData();
-
   void getCurrentUser() async {
     try{
       final user = _auth.currentUser;
@@ -49,7 +45,7 @@ PopData popData = PopData();
   var options = <String>['Highest Rated','Most Popular','Favourite'];
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    Navigator.pop(context); // Do some stuff.
+    Navigator.pop(context);
     return true;
   }
 
@@ -139,7 +135,8 @@ PopData popData = PopData();
                             releaseDate: snapshot.data.results[index].releaseDate,
                             voteAverage: snapshot.data.results[index].voteAverage,
                             popularity: snapshot.data.results[index].popularity,
-                            language: snapshot.data.results[index].originalLanguage)
+                            language: snapshot.data.results[index].originalLanguage,
+                        )
                         ),
                   ),
                 );
