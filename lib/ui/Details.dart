@@ -27,6 +27,7 @@ class _DetailsState extends State<Details> {
     getCurrentUser();
     checkMovieFav();
   }
+bool methodDone = false ;
 
   List<String> list = [];
   Future checkMovieFav()async{
@@ -35,16 +36,19 @@ class _DetailsState extends State<Details> {
           List.from(value.data()['movie-name']).forEach((element) {
             list.add(element);
             if(list.contains(widget.args.title)){
-              print('x:$element');
+
               _isFavourited = true;
             }else {
-              print('y:$element');
               _isFavourited = false ;
             }
           });
+
         });
       });
+    methodDone = true ;
   }
+
+
 
   void getCurrentUser() async {
     try{
@@ -218,10 +222,12 @@ int index ;
                                 }
                               });
                             },
-                          child: IconTheme(
-                            data: IconThemeData(color: Colors.white),
-                            child: Icon(_isFavourited?Icons.favorite : Icons
-                                .favorite_border),
+                          child: Center(
+                            child: methodDone? IconTheme(
+                              data: IconThemeData(color: Colors.white),
+                              child: Icon(_isFavourited?Icons.favorite : Icons
+                                  .favorite_border),
+                            ):CircularProgressIndicator(),
                           ),
                             ),
                       );
