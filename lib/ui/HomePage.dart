@@ -8,6 +8,8 @@ import 'package:movie_app/ui/PopularMovies.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'Login.dart';
 
+User loggedInUser ;
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -15,10 +17,26 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+
+
+PopData popData = PopData();
+
+  void getCurrentUser() async {
+    try{
+      final user = _auth.currentUser;
+      if (user!=null){
+        loggedInUser = user ;
+      }
+    }  catch (e){
+      print(e);
+    }
+  }
+
     @override
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+    getCurrentUser();
   }
 
   @override
@@ -55,6 +73,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     bloc.getTopMovies();
@@ -120,8 +139,8 @@ class _HomePageState extends State<HomePage> {
                             releaseDate: snapshot.data.results[index].releaseDate,
                             voteAverage: snapshot.data.results[index].voteAverage,
                             popularity: snapshot.data.results[index].popularity,
-                            language: snapshot.data.results[index].originalLanguage,
-                            video: snapshot.data.results[index].video)),
+                            language: snapshot.data.results[index].originalLanguage)
+                        ),
                   ),
                 );
               },

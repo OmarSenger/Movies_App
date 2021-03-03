@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User loggedInUser ;
@@ -26,6 +25,25 @@ class _DetailsState extends State<Details> {
   void initState() {
     super.initState();
     getCurrentUser();
+    checkMovieFav();
+  }
+
+  List<String> list = [];
+  Future checkMovieFav()async{
+    await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
+        setState(() {
+          List.from(value.data()['movie-name']).forEach((element) {
+            list.add(element);
+            if(list.contains(widget.args.title)){
+              print('x:$element');
+              _isFavourited = true;
+            }else {
+              print('y:$element');
+              _isFavourited = false ;
+            }
+          });
+        });
+      });
   }
 
   void getCurrentUser() async {
@@ -179,18 +197,18 @@ int index ;
                                         'movie-name':FieldValue.arrayUnion([widget.args.title]),
                                         'user': loggedInUser.email,
                                       },SetOptions(merge: true));
+
                                   Flushbar(
                                     title: widget.args.title,
                                     message: 'Added to favourite',
                                     duration: Duration(seconds: 2),
                                   ).show(context);
                                 } else if (_isFavourited==true){
-                                  setState(() {
+                                  setState((){
                                     _isFavourited=false ;
                                     _firestore.collection('Favourite').doc(loggedInUser.uid).update({
                                       'movie-name':FieldValue.arrayRemove(fav)
                                     });
-
                                   });
                                   Flushbar(
                                     title: widget.args.title,
@@ -200,11 +218,11 @@ int index ;
                                 }
                               });
                             },
-                            child: IconTheme(
-                              data: IconThemeData(color: Colors.white),
-                              child: Icon(_isFavourited&& fav.last==widget.args.title? Icons.favorite : Icons
-                                  .favorite_border),
-                            ),
+                          child: IconTheme(
+                            data: IconThemeData(color: Colors.white),
+                            child: Icon(_isFavourited?Icons.favorite : Icons
+                                .favorite_border),
+                          ),
                             ),
                       );
                     }
@@ -279,7 +297,6 @@ int index ;
       ),
     );
   }
-
 }
 
 class PopData {
@@ -290,15 +307,6 @@ class PopData {
   final double voteAverage ;
   final double popularity;
   final String language;
-  final bool video ;
-  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.video});
-}
+  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language});
 
-Future deleteFavorite(PopData popData) async {
-  var userSnapshot = await _firestore.collection('Favourite').doc(loggedInUser.uid).get();
-  var data = userSnapshot.data();
-  data['movie-name'] = data['movie-name'].where((item) {
-    return item['title'] != popData.title;
-  }).toList();
-  return await _firestore.collection('Favourite').doc(loggedInUser.uid).update(data);
 }

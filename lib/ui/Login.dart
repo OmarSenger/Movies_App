@@ -15,8 +15,6 @@ class _LoginScreenState extends State<Login> {
   TextEditingController emailController=TextEditingController();
   TextEditingController passController=TextEditingController();
   FirebaseAuth firebaseAuth=FirebaseAuth.instance;
-  // FacebookLogin _facebookLogin = FacebookLogin();
-  User _user;
 
   @override
   Widget build(BuildContext context) {

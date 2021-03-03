@@ -7,6 +7,7 @@ import 'package:movie_app/ui/HomePage.dart';
 import 'Favourite.dart';
 import 'Login.dart';
 
+User loggedInUser ;
 
 class PopularMovies extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _PopularMoviesState extends State<PopularMovies> {
 
   final _auth = FirebaseAuth.instance;
   var options = <String>['Highest Rated','Most Popular','Favourite'];
+  bool isFavourited = false ;
 
   void handleClick(String value) {
     setState(() {
@@ -38,6 +40,7 @@ class _PopularMoviesState extends State<PopularMovies> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     bloc.getPopularMovies();
@@ -104,7 +107,7 @@ class _PopularMoviesState extends State<PopularMovies> {
                             voteAverage: snapshot.data.results[index].voteAverage,
                             popularity: snapshot.data.results[index].popularity,
                             language: snapshot.data.results[index].originalLanguage,
-                            video: snapshot.data.results[index].video)),
+                            )),
                   ),
                 );
               },
