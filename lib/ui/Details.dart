@@ -9,7 +9,7 @@ User loggedInUser ;
 
 class Details extends StatefulWidget {
 
-  final PopData args;
+  final MovieData args;
   Details({Key key, this.args}) : super(key: key);
 
   @override
@@ -18,14 +18,13 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
 
-  PopData popData = PopData();
   final _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     getCurrentUser();
-    checkMovieFav();
+
   }
 
   void getCurrentUser() async {
@@ -39,26 +38,8 @@ class _DetailsState extends State<Details> {
     }
   }
 
-  bool _isFavourited = false ;
-
   var fav = [];
 int index ;
-
-  List<String> list = [];
-  Future checkMovieFav()async{
-    await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
-      setState(() {
-        List.from(value.data()['movie-name']).forEach((element) {
-          list.add(element);
-          if(list.contains(widget.args.title)){
-            _isFavourited = true;
-          }else{
-            _isFavourited = false ;
-          }
-        });
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +86,6 @@ int index ;
         },
       );
     }
-
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -186,8 +166,11 @@ int index ;
                         child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                if (_isFavourited==false) {
-                                  _isFavourited = true;
+                                if (widget.args.fav==false) {
+                                  setState((){
+                                    widget.args.fav = !widget.args.fav;
+                                  });
+
                                   _firestore.collection('Favourite').doc(
                                       loggedInUser.uid).set(
                                       {
@@ -200,9 +183,9 @@ int index ;
                                     message: 'Added to favourite',
                                     duration: Duration(seconds: 2),
                                   ).show(context);
-                                } else if (_isFavourited==true){
+                                } else if (widget.args.fav==true){
                                   setState((){
-                                    _isFavourited=false ;
+                                    widget.args.fav = !widget.args.fav;
                                     fav.add(widget.args.title);
                                     _firestore.collection('Favourite').doc(loggedInUser.uid).update({
                                       'movie-name':FieldValue.arrayRemove(fav)
@@ -216,11 +199,11 @@ int index ;
                                 }
                               });
                             },
-                          child:  IconTheme(
-                            data: IconThemeData(color: Colors.white),
-                            child: Icon(_isFavourited?Icons.favorite : Icons
-                                .favorite_border),
-                            ),
+                          child:   IconTheme(
+                              data: IconThemeData(color: Colors.white),
+                              child: Icon(widget.args.fav?Icons.favorite : Icons
+                                  .favorite_border),
+                              ),
                         ),
                       );
                     }
@@ -297,7 +280,7 @@ int index ;
   }
 }
 
-class PopData {
+class MovieData {
   final String image ;
   final String title;
   final String overview;
@@ -305,7 +288,7 @@ class PopData {
   final double voteAverage ;
   final double popularity;
   final String language;
-  final bool fav;
-  PopData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.fav=false});
+  bool fav;
+  MovieData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.fav});
 
 }

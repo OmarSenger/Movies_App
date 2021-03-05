@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/blocs/movie_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:movie_app/ui/PopularMovies.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'Login.dart';
 
+final _firestore = FirebaseFirestore.instance;
 User loggedInUser ;
 
 class HomePage extends StatefulWidget {
@@ -16,6 +18,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  bool isFavourited = false ;
+  List<String> list = [];
+
+  Future checkMovieFav(String title)async{
+    await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
+      setState(() {
+        if(value.exists){
+          List.from(value.data()['movie-name']).forEach((element) {
+            list.add(element);
+            if(list.contains(title)){
+              isFavourited = true;
+            }else{
+              isFavourited = false ;
+            }
+          });
+        }else{
+         isFavourited = false ;
+        }
+      });
+    });
+  }
 
   void getCurrentUser() async {
     try{
@@ -123,19 +147,21 @@ class _HomePageState extends State<HomePage> {
         children: List.generate(snapshot.data.results.length, (index) {
           return Container(
             child: GestureDetector(
-              onTap: () {
+              onTap: () async {
+                  await checkMovieFav(snapshot.data.results[index].title);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        Details(args: PopData(
+                        Details(args: MovieData(
                             image: "https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}",
-                            title: snapshot.data.results[index].title,
+                            title:snapshot.data.results[index].title ,
                             overview: snapshot.data.results[index].overview,
                             releaseDate: snapshot.data.results[index].releaseDate,
                             voteAverage: snapshot.data.results[index].voteAverage,
                             popularity: snapshot.data.results[index].popularity,
                             language: snapshot.data.results[index].originalLanguage,
+                            fav: isFavourited
                         )
                         ),
                   ),
