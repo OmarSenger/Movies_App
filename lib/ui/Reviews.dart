@@ -18,7 +18,7 @@ class Reviews extends StatefulWidget {
 class _ReviewsState extends State<Reviews> {
 
   final _auth = FirebaseAuth.instance;
-  final myController = TextEditingController();
+
 
   @override
   void initState() {
@@ -36,6 +36,10 @@ class _ReviewsState extends State<Reviews> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future editMovie()async{
+
   }
 
   Future getUsers() async {
@@ -62,6 +66,7 @@ class _ReviewsState extends State<Reviews> {
               child: ListView.builder(
                   itemCount: snapshot.data['Reviews'].length,
                   itemBuilder: (context,index){
+                    final myController = TextEditingController()..text=snapshot.data['Reviews'][index];
                     return Card(
                       elevation: 10,
                       child: ListTile(
@@ -79,6 +84,8 @@ class _ReviewsState extends State<Reviews> {
                                           title: Text('Write Your Review'),
                                           content: TextFormField(
                                             controller: myController,
+                                            autofocus: true,
+
                                           ),
                                           actions: <Widget>[
                                             FlatButton(
@@ -90,7 +97,23 @@ class _ReviewsState extends State<Reviews> {
                                             FlatButton(
                                               child: Text('Edit'),
                                               onPressed: () {
-                                                  Navigator.pop(context);
+                                                setState(() {
+                                                  _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                                                    'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                                                    'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                                                  }).whenComplete((){
+                                                    _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                                                      'Reviews':FieldValue.arrayUnion([myController.text]),
+                                                      'movie-name':FieldValue.arrayUnion([snapshot.data['movie-name'][index]])
+                                                    }).whenComplete((){
+                                                      Navigator.pop(context);
+                                                      Navigator.pushReplacement(
+                                                        context,
+                                                        MaterialPageRoute(builder: (context) => Reviews()),
+                                                      );
+                                                    });
+                                                  });
+                                                });
                                               },
                                             ),
                                           ]
