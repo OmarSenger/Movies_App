@@ -11,7 +11,7 @@ import 'Login.dart';
 import 'Reviews.dart';
 
 final _firestore = FirebaseFirestore.instance;
-User loggedInUser ;
+User loggedInUser;
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,41 +19,44 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  bool isFavourited = false ;
+  bool isFavourited = false;
   List<String> list = [];
 
-  Future checkMovieFav(String title)async{
-    await _firestore.collection("Favourite").doc(loggedInUser.uid).get().then((value){
+  Future checkMovieFav(String title) async {
+    await _firestore
+        .collection("Favourite")
+        .doc(loggedInUser.uid)
+        .get()
+        .then((value) {
       setState(() {
-        if(value.exists){
+        if (value.exists) {
           List.from(value.data()['movie-name']).forEach((element) {
             list.add(element);
-            if(list.contains(title)){
+            if (list.contains(title)) {
               isFavourited = true;
-            }else{
-              isFavourited = false ;
+            } else {
+              isFavourited = false;
             }
           });
-        }else{
-         isFavourited = false ;
+        } else {
+          isFavourited = false;
         }
       });
     });
   }
 
   void getCurrentUser() async {
-    try{
+    try {
       final user = _auth.currentUser;
-      if (user!=null){
-        loggedInUser = user ;
+      if (user != null) {
+        loggedInUser = user;
       }
-    }  catch (e){
+    } catch (e) {
       print(e);
     }
   }
 
-    @override
+  @override
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
@@ -67,7 +70,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   final _auth = FirebaseAuth.instance;
-  var options = <String>['Highest Rated','Most Popular','My Favorite','My Reviews'];
+  var options = <String>[
+    'Highest Rated',
+    'Most Popular',
+    'My Favorite',
+    'My Reviews'
+  ];
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pop(context);
@@ -109,16 +117,21 @@ class _HomePageState extends State<HomePage> {
         title: Text('Highest Rated'),
         actions: <Widget>[
           GestureDetector(
-              onTap: (){
+              onTap: () {
                 _auth.signOut();
-                Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => Login()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => Login()));
               },
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text('Logout',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+                child: Text('Logout',
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               )),
           PopupMenuButton<String>(
-            onSelected: handleClick ,
+            onSelected: handleClick,
             itemBuilder: (BuildContext context) {
               return options.map((String choice) {
                 return PopupMenuItem<String>(
@@ -138,7 +151,8 @@ class _HomePageState extends State<HomePage> {
           } else if (snapshot.hasError) {
             return Text(snapshot.error.toString());
           }
-          return Center(child: CircularProgressIndicator(backgroundColor: Colors.pink));
+          return Center(
+              child: CircularProgressIndicator(backgroundColor: Colors.pink));
         },
       ),
     );
@@ -154,22 +168,22 @@ class _HomePageState extends State<HomePage> {
           return Container(
             child: GestureDetector(
               onTap: () async {
-                  await checkMovieFav(snapshot.data.results[index].title);
+                await checkMovieFav(snapshot.data.results[index].title);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        Details(args: MovieData(
-                            image: "https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}",
-                            title:snapshot.data.results[index].title ,
-                            overview: snapshot.data.results[index].overview,
-                            releaseDate: snapshot.data.results[index].releaseDate,
-                            voteAverage: snapshot.data.results[index].voteAverage,
-                            popularity: snapshot.data.results[index].popularity,
-                            language: snapshot.data.results[index].originalLanguage,
-                            fav: isFavourited,
-                        )
-                        ),
+                    builder: (BuildContext context) => Details(
+                        args: MovieData(
+                      image:
+                          "https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}",
+                      title: snapshot.data.results[index].title,
+                      overview: snapshot.data.results[index].overview,
+                      releaseDate: snapshot.data.results[index].releaseDate,
+                      voteAverage: snapshot.data.results[index].voteAverage,
+                      popularity: snapshot.data.results[index].popularity,
+                      language: snapshot.data.results[index].originalLanguage,
+                      fav: isFavourited,
+                    )),
                   ),
                 );
               },
@@ -179,26 +193,22 @@ class _HomePageState extends State<HomePage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: <Widget>[
-                      Image.network("https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}"),
-                      SizedBox(height: MediaQuery
-                          .of(context)
-                          .size
-                          .height / 50, width: MediaQuery
-                          .of(context)
-                          .size
-                          .width),
-                      Text(snapshot.data.results[index].title, style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15)
-                      ),
+                      Image.network(
+                          "https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}"),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height / 50,
+                          width: MediaQuery.of(context).size.width),
+                      Text(snapshot.data.results[index].title,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15)),
                     ],
                   ),
                 ),
               ),
             ),
           );
-        })
-    );
+        }));
   }
 }

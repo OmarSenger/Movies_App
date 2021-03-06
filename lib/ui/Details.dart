@@ -212,6 +212,7 @@ int index ;
                                       {
                                         'movie-name':FieldValue.arrayUnion([widget.args.title]),
                                         'user': loggedInUser.email,
+                                        'movie-image':FieldValue.arrayUnion([widget.args.image]),
                                       },SetOptions(merge: true));
 
                                   Flushbar(
@@ -224,7 +225,8 @@ int index ;
                                     widget.args.fav = !widget.args.fav;
                                     fav.add(widget.args.title);
                                     _firestore.collection('Favourite').doc(loggedInUser.uid).update({
-                                      'movie-name':FieldValue.arrayRemove(fav)
+                                      'movie-name':FieldValue.arrayRemove(fav),
+                                      'movie-image':FieldValue.arrayRemove([widget.args.image]),
                                     });
                                   });
                                   Flushbar(

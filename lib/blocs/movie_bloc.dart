@@ -19,7 +19,6 @@ class MoviesBloc {
     Popular popular = await _repository.getPopularMovies();
     _popmoviesFetcher.sink.add(popular);
   }
-
   dispose() {
     _topmoviesFetcher.close();
     _popmoviesFetcher.close();

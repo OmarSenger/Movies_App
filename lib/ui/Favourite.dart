@@ -8,20 +8,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'Reviews.dart';
 
+Future getUsers() async {
+  var data = (await userRef.doc(loggedInUser.uid).get()).data();
+  return data;
+}
+
 DocumentSnapshot snapshot;
 final userRef = _firestore.collection('Favourite');
 final _firestore = FirebaseFirestore.instance;
-User loggedInUser ;
+User loggedInUser;
 
 class Favourite extends StatefulWidget {
-
   @override
   _FavouriteState createState() => _FavouriteState();
 }
 
 class _FavouriteState extends State<Favourite> {
-
-
   @override
   void initState() {
     super.initState();
@@ -40,17 +42,15 @@ class _FavouriteState extends State<Favourite> {
     }
   }
 
-  Future getUsers() async {
-    var data = (await userRef.doc(loggedInUser.uid)
-        .get())
-        .data();
-    return data;
-  }
-
   bool isDataLoaded = false;
 
   final _auth = FirebaseAuth.instance;
-  var options = <String>['Highest Rated', 'Most Popular', 'My Favorite','My Reviews'];
+  var options = <String>[
+    'Highest Rated',
+    'Most Popular',
+    'My Favorite',
+    'My Reviews'
+  ];
 
   void handleClick(String value) {
     setState(() {
@@ -78,61 +78,91 @@ class _FavouriteState extends State<Favourite> {
     });
   }
 
+  bool isFavourited = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.pink,
-        title: Text('Favourite'),
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                _auth.signOut();
-                Navigator.push(context, MaterialPageRoute(
-                    builder: (BuildContext context) => Login()));
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.pink,
+          title: Text('Favourite'),
+          actions: <Widget>[
+            GestureDetector(
+                onTap: () {
+                  _auth.signOut();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => Login()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Logout',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                )),
+            PopupMenuButton<String>(
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return options.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
               },
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text('Logout', style: TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
-              )),
-          PopupMenuButton<String>(
-            onSelected: handleClick,
-            itemBuilder: (BuildContext context) {
-              return options.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
-      ),
-      body: FutureBuilder(future: getUsers(),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (!snapshot.hasData) {
-            return LinearProgressIndicator();
-          } else {
-            return GestureDetector(
-              onTap: (){
-              },
-              child: ListView.builder(
-                  itemCount: snapshot.data['movie-name'].length,
-                  itemBuilder: (context,index){
-                    return Card(
-                      elevation: 10,
-                      child: ListTile(
-                        title: Text(snapshot.data['movie-name'][index]),
+            ),
+          ],
+        ),
+        body: FutureBuilder(
+          future: getUsers(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return LinearProgressIndicator();
+            } else {
+              return GridView.count(
+                  shrinkWrap: true,
+                  primary: false,
+                  childAspectRatio: 90 / 148,
+                  crossAxisCount: 2,
+                  children: List.generate(snapshot.data['movie-name'].length,
+                      (index) {
+                    return Container(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _firestore.collection('Favourite').doc(loggedInUser.uid).update({
+                              'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                              'movie-image':FieldValue.arrayRemove([snapshot.data['movie-image'][index]]),
+                            });
+                          });
+                        },
+                        child: Card(
+                          elevation: 10.0,
+                          color: Colors.white,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: <Widget>[
+                                Image.network(
+                                    snapshot.data['movie-image'][index]),
+                                SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height / 50,
+                                    width: MediaQuery.of(context).size.width),
+                                Text(snapshot.data['movie-name'][index],
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15)),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     );
-                  }
-              ),
-            );
-          }
-        },
-      ),
-    );
+                  }));
+            }
+          },
+        ));
   }
 }

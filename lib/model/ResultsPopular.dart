@@ -39,7 +39,7 @@ class Results {
     originalTitle = json['original_title'];
     overview = json['overview'];
     if (json['popularity']!=null){
-      voteAverage = json['popularity'].toDouble();
+      popularity = json['popularity'].toDouble();
     }
     posterPath = json['poster_path'];
     releaseDate = json['release_date'];
