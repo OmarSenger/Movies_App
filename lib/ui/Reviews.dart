@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -69,71 +67,84 @@ class _ReviewsState extends State<Reviews> {
                     final myController = TextEditingController()..text=snapshot.data['Reviews'][index];
                     return Card(
                       elevation: 10,
-                      child: ListTile(
-                        title: Text(snapshot.data['Reviews'][index]),
-                        subtitle: Text(snapshot.data['movie-name'][index]),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: (){
-                                return showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                          title: Text('Write Your Review'),
-                                          content: TextFormField(
-                                            controller: myController,
-                                            autofocus: true,
+                      child: Dismissible(
+                        direction: DismissDirection.endToStart,
 
-                                          ),
-                                          actions: <Widget>[
-                                            FlatButton(
-                                              child: Text('CANCEL'),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
+                        key: UniqueKey(),
+                        onDismissed: (direction){
+                            _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                              'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                              'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                          });
+                            },
+                        background: Container(
+                          color: Colors.pink,
+                        ),
+                        child: ListTile(
+                          title: Text(snapshot.data['Reviews'][index]),
+                          subtitle: Text(snapshot.data['movie-name'][index]),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  return showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                            title: Text('Write Your Review'),
+                                            content: TextFormField(
+                                              controller: myController,
+                                              autofocus: true,
                                             ),
-                                            FlatButton(
-                                              child: Text('Edit'),
-                                              onPressed: () {
-                                                setState(() {
-                                                  _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                                    'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
-                                                    'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                                                  }).whenComplete((){
+                                            actions: <Widget>[
+                                              FlatButton(
+                                                child: Text('CANCEL'),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                              FlatButton(
+                                                child: Text('Edit'),
+                                                onPressed: () {
+                                                  setState(() {
                                                     _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                                      'Reviews':FieldValue.arrayUnion([myController.text]),
-                                                      'movie-name':FieldValue.arrayUnion([snapshot.data['movie-name'][index]])
+                                                      'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                                                      'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
                                                     }).whenComplete((){
-                                                      Navigator.pop(context);
-                                                      Navigator.pushReplacement(
-                                                        context,
-                                                        MaterialPageRoute(builder: (context) => Reviews()),
-                                                      );
+                                                      _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                                                        'Reviews':FieldValue.arrayUnion([myController.text]),
+                                                        'movie-name':FieldValue.arrayUnion([snapshot.data['movie-name'][index]])
+                                                      }).whenComplete((){
+                                                        Navigator.pop(context);
+                                                        Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(builder: (context) => Reviews()),
+                                                        );
+                                                      });
                                                     });
                                                   });
-                                                });
-                                              },
-                                            ),
-                                          ]
-                                      );
-                                    }
-                                );
-                              },
-                                child: Icon(Icons.edit,color: Colors.pink)),
-                            SizedBox(width: 12),
-                            GestureDetector(
-                              onTap: (){
-                                setState(() {
-                                  _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                    'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                                    'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                                                },
+                                              ),
+                                            ]
+                                        );
+                                      }
+                                  );
+                                },
+                                  child: Icon(Icons.edit,color: Colors.pink)),
+                              SizedBox(width: 12),
+                              GestureDetector(
+                                onTap: (){
+                                  setState(() {
+                                    _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                                      'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                                      'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                                    });
                                   });
-                                });
-                              },
-                                child: Icon(Icons.delete,color: Colors.pink)),
-                          ],
+                                },
+                                  child: Icon(Icons.delete,color: Colors.pink)),
+                            ],
+                          ),
                         ),
                       ),
                     );
