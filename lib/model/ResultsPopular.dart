@@ -38,7 +38,9 @@ class Results {
     originalLanguage = json['original_language'];
     originalTitle = json['original_title'];
     overview = json['overview'];
-    popularity = json['popularity'];
+    if (json['popularity']!=null){
+      voteAverage = json['popularity'].toDouble();
+    }
     posterPath = json['poster_path'];
     releaseDate = json['release_date'];
     title = json['title'];
