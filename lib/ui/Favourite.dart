@@ -6,6 +6,8 @@ import 'Login.dart';
 import 'PopularMovies.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'Reviews.dart';
+
 DocumentSnapshot snapshot;
 final userRef = _firestore.collection('Favourite');
 final _firestore = FirebaseFirestore.instance;
@@ -48,12 +50,12 @@ class _FavouriteState extends State<Favourite> {
   bool isDataLoaded = false;
 
   final _auth = FirebaseAuth.instance;
-  var options = <String>['Highest Rated', 'Most Popular', 'Favourite'];
+  var options = <String>['Highest Rated', 'Most Popular', 'My Favorite','My Reviews'];
 
   void handleClick(String value) {
     setState(() {
       switch (value) {
-        case 'Favourite':
+        case 'My Favourite':
           break;
         case 'Most Popular':
           Navigator.push(
@@ -67,6 +69,11 @@ class _FavouriteState extends State<Favourite> {
             MaterialPageRoute(builder: (context) => HomePage()),
           );
           break;
+        case 'My Reviews':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Reviews()),
+          );
       }
     });
   }

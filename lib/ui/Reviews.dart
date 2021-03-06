@@ -3,6 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'Favourite.dart';
+import 'HomePage.dart';
+import 'Login.dart';
+import 'PopularMovies.dart';
+
 DocumentSnapshot snapshot;
 final userRef = _firestore.collection('Reviews');
 final _firestore = FirebaseFirestore.instance;
@@ -47,11 +52,62 @@ class _ReviewsState extends State<Reviews> {
     return data;
   }
 
+  var options = <String>['Highest Rated', 'Most Popular', 'My Favorite','My Reviews'];
+
+  void handleClick(String value) {
+    setState(() {
+      switch (value) {
+        case 'My Favorite':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Favourite()),
+          );
+          break;
+        case 'Most Popular':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PopularMovies()),
+          );
+          break;
+        case 'Highest Rated':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
+          break;
+        case 'My Reviews':
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
     appBar: AppBar(
       title: Text('Reviews'),
+      actions: <Widget>[
+        GestureDetector(
+            onTap: (){
+              _auth.signOut();
+              Navigator.push(context, MaterialPageRoute(builder:(BuildContext context) => Login()));
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text('Logout',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+            )),
+        PopupMenuButton<String>(
+          onSelected: handleClick ,
+          itemBuilder: (BuildContext context) {
+            return options.map((String choice) {
+              return PopupMenuItem<String>(
+                value: choice,
+                child: Text(choice),
+              );
+            }).toList();
+          },
+        ),
+      ],
     ),
       body: FutureBuilder(future: getUsers(),
         builder: (context, AsyncSnapshot snapshot) {
