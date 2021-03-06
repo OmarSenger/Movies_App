@@ -24,7 +24,9 @@ class _DetailsState extends State<Details> {
   void initState() {
     super.initState();
     getCurrentUser();
-
+    setState(() {
+      checkMovieRev(widget.args.title);
+    });
   }
 
   void getCurrentUser() async {
@@ -40,6 +42,27 @@ class _DetailsState extends State<Details> {
 
   var fav = [];
 int index ;
+
+  List rev = [];
+  bool isReviewed = false ;
+  Future checkMovieRev(String title)async{
+    await _firestore.collection("Reviews").doc(loggedInUser.email).get().then((value){
+      setState(() {
+        if(value.exists){
+          List.from(value.data()['movie-name']).forEach((element) {
+            rev.add(element);
+            if(rev.contains(title)){
+              isReviewed = true;
+            }else{
+              isReviewed = false ;
+            }
+          });
+        }else{
+          isReviewed = false ;
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +95,11 @@ int index ;
                   if (myController.text.isEmpty){
                     Navigator.pop(context);
                   }else {
+                    isReviewed = true ;
+                    _firestore.collection('Reviews').doc(loggedInUser.email).set({
+                      'Reviews':FieldValue.arrayUnion([myController.text]),
+                      'movie-name':FieldValue.arrayUnion([widget.args.title]),
+                    },SetOptions(merge: true));
                     Navigator.pop(context);
                     Flushbar(
                       title: '${widget.args.title} Review :',
@@ -122,11 +150,19 @@ int index ;
                                   Text(widget.args.releaseDate),
                                   SizedBox(height:height*0.1),
                                   RaisedButton(
-                                      color: Colors.teal.shade400,
+                                      color: isReviewed?Colors.black12:Colors.teal.shade400,
                                       child: Text('Reviews',
                                         style: TextStyle(color: Colors.white)),
                                       onPressed: () {
-                                        _displayTextInputDialog(context);
+                                        if(isReviewed==false){
+                                          _displayTextInputDialog(context);
+                                        }else{
+                                          Flushbar(
+                                            title: widget.args.title,
+                                            message: "You can't add another review for this movie , please delete your review from My Reviews Page first",
+                                            duration: Duration(seconds: 4),
+                                          ).show(context);
+                                        }
                                       },
                                       shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(10.0))
                                   ),

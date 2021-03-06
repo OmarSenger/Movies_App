@@ -7,6 +7,7 @@ import 'package:movie_app/ui/Details.dart';
 import 'package:movie_app/ui/HomePage.dart';
 import 'Favourite.dart';
 import 'Login.dart';
+import 'Reviews.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User loggedInUser ;
@@ -19,7 +20,7 @@ class PopularMovies extends StatefulWidget {
 class _PopularMoviesState extends State<PopularMovies> {
 
   final _auth = FirebaseAuth.instance;
-  var options = <String>['Highest Rated','Most Popular','Favourite'];
+  var options = <String>['Highest Rated','Most Popular','My Favorite','My Reviews'];
   bool isFavourited = false ;
 
   void handleClick(String value) {
@@ -33,12 +34,17 @@ class _PopularMoviesState extends State<PopularMovies> {
           break;
         case 'Most Popular':
           break;
-        case 'Favourite':
+        case 'My Favorite':
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Favourite()),
           );
           break;
+        case 'My Reviews':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Reviews()),
+          );
       }
     });
   }

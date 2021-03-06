@@ -8,6 +8,7 @@ import 'package:movie_app/ui/Favourite.dart';
 import 'package:movie_app/ui/PopularMovies.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'Login.dart';
+import 'Reviews.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User loggedInUser ;
@@ -66,7 +67,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   final _auth = FirebaseAuth.instance;
-  var options = <String>['Highest Rated','Most Popular','Favourite'];
+  var options = <String>['Highest Rated','Most Popular','My Favorite','My Reviews'];
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     Navigator.pop(context);
@@ -84,12 +85,17 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(builder: (context) => PopularMovies()),
           );
           break;
-        case 'Favourite':
+        case 'My Favorite':
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Favourite()),
           );
           break;
+        case 'My Reviews':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Reviews()),
+          );
       }
     });
   }
@@ -161,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                             voteAverage: snapshot.data.results[index].voteAverage,
                             popularity: snapshot.data.results[index].popularity,
                             language: snapshot.data.results[index].originalLanguage,
-                            fav: isFavourited
+                            fav: isFavourited,
                         )
                         ),
                   ),
