@@ -21,17 +21,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool isFavourited = false;
   List<String> list = [];
+  int index;
 
   Future checkMovieFav(String title) async {
     await _firestore
         .collection("Favourite")
-        .doc(loggedInUser.uid)
+        .doc(loggedInUser.email)
         .get()
         .then((value) {
       setState(() {
         if (value.exists) {
-          List.from(value.data()['movie-name']).forEach((element) {
-            list.add(element);
+          List.from(value.data()['movie']).forEach((element) {
+            list.add(element['movie-name']);
             if (list.contains(title)) {
               isFavourited = true;
             } else {
@@ -179,8 +180,8 @@ class _HomePageState extends State<HomePage> {
                       title: snapshot.data.results[index].title,
                       overview: snapshot.data.results[index].overview,
                       releaseDate: snapshot.data.results[index].releaseDate,
-                      voteAverage: snapshot.data.results[index].voteAverage,
-                      popularity: snapshot.data.results[index].popularity,
+                      voteAverage:'${snapshot.data.results[index].voteAverage}',
+                      popularity:'${snapshot.data.results[index].popularity}',
                       language: snapshot.data.results[index].originalLanguage,
                       fav: isFavourited,
                     )),

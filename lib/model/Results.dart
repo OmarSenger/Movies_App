@@ -44,7 +44,7 @@ class Results {
     title = json['title'];
     video = json['video'];
     if (json['vote_average']!=null){
-      voteAverage = json['vote_average'].toDouble();
+      voteAverage = json['vote_average'];
     }
     voteCount = json['vote_count'];
   }

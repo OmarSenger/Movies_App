@@ -190,7 +190,9 @@ int index ;
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.31, left: 10),
-                    child: Text(widget.args.title, style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white)),
+                    child: Container(
+                        color: Colors.black54,
+                        child: Text(widget.args.title, style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white))),
                   ),
                   Padding(
                     padding:EdgeInsets.only(top:MediaQuery.of(context).size.height*0.35,left:MediaQuery.of(context).size.width*0.87),
@@ -206,15 +208,18 @@ int index ;
                                   setState((){
                                     widget.args.fav = !widget.args.fav;
                                   });
-
                                   _firestore.collection('Favourite').doc(
-                                      loggedInUser.uid).set(
+                                      loggedInUser.email).set(
                                       {
-                                        'movie-name':FieldValue.arrayUnion([widget.args.title]),
-                                        'user': loggedInUser.email,
-                                        'movie-image':FieldValue.arrayUnion([widget.args.image]),
-                                      },SetOptions(merge: true));
-
+                                        'movie':FieldValue.arrayUnion([{
+                                          'movie-name':widget.args.title.toString(),
+                                          'language':widget.args.language.toString(),
+                                          'movie-image':widget.args.image.toString(),
+                                          'overview':widget.args.overview.toString(),
+                                        'release-date':widget.args.releaseDate.toString(),
+                                        'popularity':widget.args.popularity.toString(),
+                                        'vote-average':widget.args.voteAverage.toString()}])
+                                },SetOptions(merge: true));
                                   Flushbar(
                                     title: widget.args.title,
                                     message: 'Added to favourite',
@@ -224,9 +229,15 @@ int index ;
                                   setState((){
                                     widget.args.fav = !widget.args.fav;
                                     fav.add(widget.args.title);
-                                    _firestore.collection('Favourite').doc(loggedInUser.uid).update({
-                                      'movie-name':FieldValue.arrayRemove(fav),
-                                      'movie-image':FieldValue.arrayRemove([widget.args.image]),
+                                    _firestore.collection('Favourite').doc(loggedInUser.email).update({
+                                      'movie':FieldValue.arrayRemove([{
+                                        'movie-name':widget.args.title,
+                                        'language':widget.args.language,
+                                        'movie-image':widget.args.image,
+                                        'overview':widget.args.overview,
+                                        'release-date':widget.args.releaseDate,
+                                        'popularity':widget.args.popularity,
+                                        'vote-average':widget.args.voteAverage}])
                                     });
                                   });
                                   Flushbar(
@@ -323,8 +334,8 @@ class MovieData {
   final String title;
   final String overview;
   final String releaseDate;
-  final double voteAverage ;
-  final double popularity;
+  final String voteAverage ;
+  final String popularity;
   final String language;
   bool fav;
   MovieData({this.image,this.title,this.overview,this.releaseDate,this.voteAverage,this.popularity,this.language,this.fav});

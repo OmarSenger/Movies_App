@@ -39,14 +39,14 @@ class Results {
     originalTitle = json['original_title'];
     overview = json['overview'];
     if (json['popularity']!=null){
-      popularity = json['popularity'].toDouble();
+      popularity = json['popularity'];
     }
     posterPath = json['poster_path'];
     releaseDate = json['release_date'];
     title = json['title'];
     video = json['video'];
     if (json['vote_average']!=null){
-      voteAverage = json['vote_average'].toDouble();
+      voteAverage = json['vote_average'];
     }
     voteCount = json['vote_count'];
   }

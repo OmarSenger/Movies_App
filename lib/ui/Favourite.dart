@@ -2,14 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/ui/HomePage.dart';
+import 'Details.dart';
 import 'Login.dart';
 import 'PopularMovies.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'Reviews.dart';
 
+int index ;
+
 Future getUsers() async {
-  var data = (await userRef.doc(loggedInUser.uid).get()).data();
+  var data = (await userRef.doc(loggedInUser.email).get()).data();
   return data;
 }
 
@@ -114,7 +117,8 @@ class _FavouriteState extends State<Favourite> {
             ),
           ],
         ),
-        body: FutureBuilder(
+        body:
+        FutureBuilder(
           future: getUsers(),
           builder: (context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
@@ -125,17 +129,28 @@ class _FavouriteState extends State<Favourite> {
                   primary: false,
                   childAspectRatio: 90 / 148,
                   crossAxisCount: 2,
-                  children: List.generate(snapshot.data['movie-name'].length,
+                  children: List.generate(snapshot.data['movie'].length,
                       (index) {
                     return Container(
                       child: GestureDetector(
                         onTap: () {
-                          setState(() {
-                            _firestore.collection('Favourite').doc(loggedInUser.uid).update({
-                              'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                              'movie-image':FieldValue.arrayRemove([snapshot.data['movie-image'][index]]),
-                            });
-                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => Details(
+                                  args: MovieData(
+                                    image:
+                                    snapshot.data['movie'][index]['movie-image'],
+                                    title: snapshot.data['movie'][index]['movie-name'],
+                                    overview: snapshot.data['movie'][index]['overview'],
+                                    releaseDate: snapshot.data['movie'][index]['release-date'],
+                                    voteAverage: snapshot.data['movie'][index]['vote-average'],
+                                    popularity: snapshot.data['movie'][index]['popularity'],
+                                    language: snapshot.data['movie'][index]['language'],
+                                    fav: isFavourited,
+                                  )),
+                            ),
+                          );
                         },
                         child: Card(
                           elevation: 10.0,
@@ -144,12 +159,12 @@ class _FavouriteState extends State<Favourite> {
                             child: Column(
                               children: <Widget>[
                                 Image.network(
-                                    snapshot.data['movie-image'][index]),
+                                    snapshot.data['movie'][index]['movie-image']),
                                 SizedBox(
                                     height:
                                         MediaQuery.of(context).size.height / 50,
                                     width: MediaQuery.of(context).size.width),
-                                Text(snapshot.data['movie-name'][index],
+                                Text(snapshot.data['movie'][index]['movie-name'],
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
@@ -163,6 +178,7 @@ class _FavouriteState extends State<Favourite> {
                   }));
             }
           },
-        ));
+        )
+    );
   }
 }
