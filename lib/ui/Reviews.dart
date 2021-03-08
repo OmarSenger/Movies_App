@@ -80,7 +80,7 @@ class _ReviewsState extends State<Reviews> {
       }
     });
   }
-
+bool selected = false ;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,89 +121,147 @@ class _ReviewsState extends State<Reviews> {
                   itemCount: snapshot.data['Reviews'].length,
                   itemBuilder: (context,index){
                     final myController = TextEditingController()..text=snapshot.data['Reviews'][index];
-                    return Card(
-                      elevation: 10,
-                      child: Dismissible(
-                        direction: DismissDirection.endToStart,
-
-                        key: UniqueKey(),
-                        onDismissed: (direction){
-                            _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                              'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                              'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
-                          });
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          onTap: (){
+                            setState(() {
+                              selected = !selected;
+                            });
+                          },
+                          child: AnimatedSwitcher(
+                            transitionBuilder: (Widget child , Animation<double> animation){
+                              return ScaleTransition(scale: animation,child: child);
                             },
-                        background: Container(
-                          color: Colors.pink,
-                        ),
-                        child: ListTile(
-                          title: Text(snapshot.data['Reviews'][index]),
-                          subtitle: Text(snapshot.data['movie-name'][index]),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  return showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                            title: Text('Write Your Review'),
-                                            content: TextFormField(
-                                              controller: myController,
-                                              autofocus: true,
-                                            ),
-                                            actions: <Widget>[
-                                              FlatButton(
-                                                child: Text('CANCEL'),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                              ),
-                                              FlatButton(
-                                                child: Text('Edit'),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                                      'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
-                                                      'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                                                    }).whenComplete((){
-                                                      _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                                        'Reviews':FieldValue.arrayUnion([myController.text]),
-                                                        'movie-name':FieldValue.arrayUnion([snapshot.data['movie-name'][index]])
-                                                      }).whenComplete((){
-                                                        Navigator.pop(context);
-                                                        Navigator.pushReplacement(
-                                                          context,
-                                                          MaterialPageRoute(builder: (context) => Reviews()),
-                                                        );
-                                                      });
-                                                    });
-                                                  });
-                                                },
-                                              ),
-                                            ]
-                                        );
-                                      }
-                                  );
-                                },
-                                  child: Icon(Icons.edit,color: Colors.pink)),
-                              SizedBox(width: 12),
-                              GestureDetector(
-                                onTap: (){
-                                  setState(() {
-                                    _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                      'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                                      'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
-                                    });
-                                  });
-                                },
-                                  child: Icon(Icons.delete,color: Colors.pink)),
-                            ],
+                            switchInCurve: Curves.fastOutSlowIn,
+                            duration: Duration(seconds: 1),
+                            child: !selected?Stack(
+                              children: [
+                                Container(
+                                  width: 420,
+                                  height: 210,
+                                  child: Image.network(snapshot.data['movie-image'][index],fit: BoxFit.cover,),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top:185),
+                                  child: Container(
+                                    color: Colors.black38,
+                                      child: Text(snapshot.data['movie-name'][index],style: TextStyle(color: Colors.white,fontSize: 18,fontWeight: FontWeight.bold))),
+                                )
+                              ],
+                            ):Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: CircleAvatar(radius: 100,backgroundImage: NetworkImage(snapshot.data['movie-image'][index])),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: SingleChildScrollView(
+                                    child: Container(
+                                      width: 200,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                          color: Colors.pink.shade400,
+                                        borderRadius: BorderRadius.circular(36)
+                                      ),
+                                      child: Center(child:Text(snapshot.data['Reviews'][index],style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.white))),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
+                        )
+                        // CircleAvatar(
+                        //   radius: 80,
+                        //   backgroundImage: NetworkImage(snapshot.data['movie-image'][index]),
+                        // )
+                      ],
                     );
+                    // return Card(
+                    //   elevation: 10,
+                    //   child: Dismissible(
+                    //     direction: DismissDirection.endToStart,
+                    //
+                    //     key: UniqueKey(),
+                    //     onDismissed: (direction){
+                    //         _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                    //           'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                    //           'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                    //       });
+                    //         },
+                    //     background: Container(
+                    //       color: Colors.pink,
+                    //     ),
+                    //     child: ListTile(
+                    //       title: Text(snapshot.data['Reviews'][index]),
+                    //       subtitle: Text(snapshot.data['movie-name'][index]),
+                    //       trailing: Row(
+                    //         mainAxisSize: MainAxisSize.min,
+                    //         children: [
+                    //           GestureDetector(
+                    //             onTap: (){
+                    //               return showDialog(
+                    //                   context: context,
+                    //                   builder: (context) {
+                    //                     return AlertDialog(
+                    //                         title: Text('Write Your Review'),
+                    //                         content: TextFormField(
+                    //                           controller: myController,
+                    //                           autofocus: true,
+                    //                         ),
+                    //                         actions: <Widget>[
+                    //                           FlatButton(
+                    //                             child: Text('CANCEL'),
+                    //                             onPressed: () {
+                    //                               Navigator.pop(context);
+                    //                             },
+                    //                           ),
+                    //                           FlatButton(
+                    //                             child: Text('Edit'),
+                    //                             onPressed: () {
+                    //                               setState(() {
+                    //                                 _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                    //                                   'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                    //                                   'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                    //                                 }).whenComplete((){
+                    //                                   _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                    //                                     'Reviews':FieldValue.arrayUnion([myController.text]),
+                    //                                     'movie-name':FieldValue.arrayUnion([snapshot.data['movie-name'][index]])
+                    //                                   }).whenComplete((){
+                    //                                     Navigator.pop(context);
+                    //                                     Navigator.pushReplacement(
+                    //                                       context,
+                    //                                       MaterialPageRoute(builder: (context) => Reviews()),
+                    //                                     );
+                    //                                   });
+                    //                                 });
+                    //                               });
+                    //                             },
+                    //                           ),
+                    //                         ]
+                    //                     );
+                    //                   }
+                    //               );
+                    //             },
+                    //               child: Icon(Icons.edit,color: Colors.pink)),
+                    //           SizedBox(width: 12),
+                    //           GestureDetector(
+                    //             onTap: (){
+                    //               setState(() {
+                    //                 _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                    //                   'movie-name':FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                    //                   'Reviews':FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                    //                 });
+                    //               });
+                    //             },
+                    //               child: Icon(Icons.delete,color: Colors.pink)),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // );
                   }
               ),
             );

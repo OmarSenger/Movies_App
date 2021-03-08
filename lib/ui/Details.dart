@@ -99,6 +99,7 @@ int index ;
                     _firestore.collection('Reviews').doc(loggedInUser.email).set({
                       'Reviews':FieldValue.arrayUnion([myController.text]),
                       'movie-name':FieldValue.arrayUnion([widget.args.title]),
+                      'movie-image':FieldValue.arrayUnion([widget.args.image])
                     },SetOptions(merge: true));
                     Navigator.pop(context);
                     Flushbar(
@@ -159,7 +160,7 @@ int index ;
                                         }else{
                                           Flushbar(
                                             title: widget.args.title,
-                                            message: "You can't add another review for this movie , please delete your review from My Reviews Page first",
+                                            message: "You can't add another review for this movie , please delete or edit your review from My Reviews Page",
                                             duration: Duration(seconds: 4),
                                           ).show(context);
                                         }
