@@ -148,8 +148,8 @@ class _ReviewsState extends State<Reviews> {
                                 ? Stack(
                                     children: [
                                       Container(
-                                        width: 420,
-                                        height: 210,
+                                        width: MediaQuery.of(context).size.width,
+                                        height: MediaQuery.of(context).size.height/3.5,
                                         child: Image.network(
                                           snapshot.data['movie-image'][index],
                                           fit: BoxFit.cover,
@@ -189,7 +189,7 @@ class _ReviewsState extends State<Reviews> {
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: CircleAvatar(
-                                          radius: 100,
+                                          radius: 103,
                                           backgroundImage: NetworkImage(snapshot
                                               .data['movie-image'][index]),
                                           child: GestureDetector(
@@ -245,7 +245,7 @@ class _ReviewsState extends State<Reviews> {
                                                 width: 100,
                                                 height: 100,
                                                 decoration: BoxDecoration(
-                                                  color:Colors.pink.withOpacity(0.3),
+                                                  color:Colors.black38.withOpacity(0.4),
                                                     borderRadius: BorderRadius.circular(100)),
                                                 child: Icon(Icons.edit,
                                                     color: Colors.white,size: 50),
@@ -256,7 +256,7 @@ class _ReviewsState extends State<Reviews> {
                                         padding: const EdgeInsets.all(5.0),
                                         child: Container(
                                           padding: EdgeInsets.only(top:5),
-                                          width: MediaQuery.of(context).size.width/2.4,
+                                          width: MediaQuery.of(context).size.width/2.5,
                                           height: MediaQuery.of(context).size.height/5,
                                           decoration: BoxDecoration(
                                               color: Colors.pink.shade400.withOpacity(0.8),
