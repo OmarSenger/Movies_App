@@ -162,7 +162,7 @@ class _FavouriteState extends State<Favourite> {
                                     snapshot.data['movie'][index]['movie-image']),
                                 SizedBox(
                                     height:
-                                        MediaQuery.of(context).size.height / 50,
+                                        MediaQuery.of(context).size.height / 58,
                                     width: MediaQuery.of(context).size.width),
                                 Text(snapshot.data['movie'][index]['movie-name'],
                                     style: TextStyle(

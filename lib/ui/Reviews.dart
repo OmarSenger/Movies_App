@@ -256,8 +256,8 @@ class _ReviewsState extends State<Reviews> {
                                         padding: const EdgeInsets.all(5.0),
                                         child: Container(
                                           padding: EdgeInsets.only(top:5),
-                                          width: 200,
-                                          height: 150,
+                                          width: MediaQuery.of(context).size.width/2.4,
+                                          height: MediaQuery.of(context).size.height/5,
                                           decoration: BoxDecoration(
                                               color: Colors.pink.shade400.withOpacity(0.8),
                                               borderRadius:

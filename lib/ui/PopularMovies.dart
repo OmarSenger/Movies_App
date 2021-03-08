@@ -168,7 +168,7 @@ class _PopularMoviesState extends State<PopularMovies> {
                       SizedBox(height: MediaQuery
                           .of(context)
                           .size
-                          .height / 50, width: MediaQuery
+                          .height / 58, width: MediaQuery
                           .of(context)
                           .size
                           .width),

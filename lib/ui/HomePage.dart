@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                       Image.network(
                           "https://image.tmdb.org/t/p/w342/${snapshot.data.results[index].posterPath}"),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height / 50,
+                          height: MediaQuery.of(context).size.height / 58,
                           width: MediaQuery.of(context).size.width),
                       Text(snapshot.data.results[index].title,
                           style: TextStyle(
