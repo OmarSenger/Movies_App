@@ -258,7 +258,8 @@ class _ReviewsState extends State<Reviews> {
                                           decoration: BoxDecoration(
                                               color: Colors.pink.shade400.withOpacity(0.8),
                                               borderRadius:
-                                                  BorderRadius.only(topRight:Radius.circular(40),bottomLeft: Radius.circular(40))),
+                                                  BorderRadius.only(topRight:Radius.circular(40),bottomLeft: Radius.circular(40))
+                                          ),
                                           child: SingleChildScrollView(
                                             padding:EdgeInsets.only(top: 35),
                                             child: Center(
