@@ -76,47 +76,51 @@ int index ;
       return showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text('Write Your Review'),
-            content: TextField(
-              controller: myController,
-              decoration: InputDecoration(hintText: "Write Your Review Here"),
+          return Padding(
+            padding: const EdgeInsets.all(30),
+            child: AlertDialog(
+              title: Text('Write Your Review'),
+              scrollable: true,
+              content: TextField(
+                controller: myController,
+                decoration: InputDecoration(hintText: "Write Your Review Here"),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('CANCEL'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                FlatButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    if (myController.text.isEmpty){
+                      Navigator.pop(context);
+                    }else {
+                      isReviewed = true ;
+                      _firestore.collection('Reviews').doc(loggedInUser.email).set({
+                        'Reviews':FieldValue.arrayUnion([myController.text]),
+                        'movie-name':FieldValue.arrayUnion([widget.args.title]),
+                        'movie-image':FieldValue.arrayUnion([widget.args.image])
+                      },SetOptions(merge: true));
+                      Navigator.pop(context);
+                      Flushbar(
+                        title: '${widget.args.title} Review :',
+                        message: '${myController.text}',
+                        duration: Duration(seconds: 4),
+                      ).show(context);
+                    }
+                  },
+                ),
+              ],
             ),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('CANCEL'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FlatButton(
-                child: Text('OK'),
-                onPressed: () {
-                  if (myController.text.isEmpty){
-                    Navigator.pop(context);
-                  }else {
-                    isReviewed = true ;
-                    _firestore.collection('Reviews').doc(loggedInUser.email).set({
-                      'Reviews':FieldValue.arrayUnion([myController.text]),
-                      'movie-name':FieldValue.arrayUnion([widget.args.title]),
-                      'movie-image':FieldValue.arrayUnion([widget.args.image])
-                    },SetOptions(merge: true));
-                    Navigator.pop(context);
-                    Flushbar(
-                      title: '${widget.args.title} Review :',
-                      message: '${myController.text}',
-                      duration: Duration(seconds: 4),
-                    ).show(context);
-                  }
-                },
-              ),
-            ],
           );
         },
       );
     }
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: ()async=>false,
       child: Scaffold(
         backgroundColor: Colors.grey.shade200,
         body: SingleChildScrollView(

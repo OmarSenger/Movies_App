@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    Navigator.pop(context);
+   Navigator.pop(context);
     return true;
   }
 
@@ -112,49 +112,52 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     bloc.getTopMovies();
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text('Highest Rated'),
-        actions: <Widget>[
-          GestureDetector(
-              onTap: () {
-                _auth.signOut();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => Login()));
+    return WillPopScope(
+      onWillPop: ()async=>false,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text('Highest Rated'),
+          actions: <Widget>[
+            GestureDetector(
+                onTap: () {
+                  _auth.signOut();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => Login()));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Logout',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                )),
+            PopupMenuButton<String>(
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) {
+                return options.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
               },
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text('Logout',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              )),
-          PopupMenuButton<String>(
-            onSelected: handleClick,
-            itemBuilder: (BuildContext context) {
-              return options.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
-      ),
-      body: StreamBuilder(
-        stream: bloc.topMovies,
-        builder: (context, AsyncSnapshot<TopRated> snapshot) {
-          if (snapshot.hasData) {
-            return buildList(snapshot);
-          } else if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          return Center(
-              child: CircularProgressIndicator(backgroundColor: Colors.pink));
-        },
+            ),
+          ],
+        ),
+        body: StreamBuilder(
+          stream: bloc.topMovies,
+          builder: (context, AsyncSnapshot<TopRated> snapshot) {
+            if (snapshot.hasData) {
+              return buildList(snapshot);
+            } else if (snapshot.hasError) {
+              return Text(snapshot.error.toString());
+            }
+            return Center(
+                child: CircularProgressIndicator(backgroundColor: Colors.pink));
+          },
+        ),
       ),
     );
   }

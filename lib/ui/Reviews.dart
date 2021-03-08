@@ -197,45 +197,48 @@ class _ReviewsState extends State<Reviews> {
                                                 return showDialog(
                                                     context: context,
                                                     builder: (context) {
-                                                      return AlertDialog(
-                                                          title: Text(
-                                                              'Write Your Review'),
-                                                          content: TextFormField(
-                                                            controller: myController,
-                                                            autofocus: true,
-                                                          ),
-                                                          actions: <Widget>[
-                                                            FlatButton(
-                                                              child: Text('CANCEL'),
-                                                              onPressed: () {
-                                                                Navigator.pop(context);
-                                                              },
+                                                      return Padding(
+                                                        padding: const EdgeInsets.all(30),
+                                                        child: AlertDialog(
+                                                            title: Text(
+                                                                'Write Your Review'),
+                                                            content: TextFormField(
+                                                              controller: myController,
+                                                              autofocus: true,
                                                             ),
-                                                            FlatButton(
-                                                              child: Text('Edit'),
-                                                              onPressed: () {
-                                                                setState((){
-                                                                  _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                                                    'Reviews': FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
-                                                                    'movie-name': FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
-                                                                    'movie-image': FieldValue.arrayRemove([snapshot.data['movie-image'][index]]),
-                                                                  }).whenComplete(() {
+                                                            actions: <Widget>[
+                                                              FlatButton(
+                                                                child: Text('CANCEL'),
+                                                                onPressed: () {
+                                                                  Navigator.pop(context);
+                                                                },
+                                                              ),
+                                                              FlatButton(
+                                                                child: Text('Edit'),
+                                                                onPressed: () {
+                                                                  setState((){
                                                                     _firestore.collection('Reviews').doc(loggedInUser.email).update({
-                                                                      'Reviews': FieldValue.arrayUnion([myController.text]),
-                                                                      'movie-name': FieldValue.arrayUnion([snapshot.data['movie-name'][index]]),
-                                                                      'movie-image': FieldValue.arrayUnion([snapshot.data['movie-image'][index]]),
+                                                                      'Reviews': FieldValue.arrayRemove([snapshot.data['Reviews'][index]]),
+                                                                      'movie-name': FieldValue.arrayRemove([snapshot.data['movie-name'][index]]),
+                                                                      'movie-image': FieldValue.arrayRemove([snapshot.data['movie-image'][index]]),
                                                                     }).whenComplete(() {
-                                                                      Navigator.pop(context);
-                                                                      Navigator.pushReplacement(
-                                                                        context,
-                                                                        MaterialPageRoute(builder: (context) => Reviews()),
-                                                                      );
+                                                                      _firestore.collection('Reviews').doc(loggedInUser.email).update({
+                                                                        'Reviews': FieldValue.arrayUnion([myController.text]),
+                                                                        'movie-name': FieldValue.arrayUnion([snapshot.data['movie-name'][index]]),
+                                                                        'movie-image': FieldValue.arrayUnion([snapshot.data['movie-image'][index]]),
+                                                                      }).whenComplete(() {
+                                                                        Navigator.pop(context);
+                                                                        Navigator.pushReplacement(
+                                                                          context,
+                                                                          MaterialPageRoute(builder: (context) => Reviews()),
+                                                                        );
+                                                                      });
                                                                     });
                                                                   });
-                                                                });
-                                                              },
-                                                            ),
-                                                          ]);
+                                                                },
+                                                              ),
+                                                            ]),
+                                                      );
                                                     });
                                               },
                                               child: Container(
